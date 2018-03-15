@@ -1,37 +1,4 @@
-Rails:
-  Enabled: true
-
-AsciiComments:
-  Enabled: false
-
-AllCops:
-  TargetRubyVersion: 2.5
-  Exclude:
-    - 'db/schema.rb'
-    - '**/bin/**/*'
-    - '**/templates/**/*'
-    - '**/vendor/**/*'
-    - '**/node_modules/**/*'
-
-# Prefer &&/|| over and/or.
-Style/AndOr:
-  Enabled: true
-
-# Limit lines to 120 characters.
-Metrics/LineLength:
-   Max: 120
-
-# Limit lines to 120 rows.
-Metrics/MethodLength: 
-   Max: 20
-
-# Missing top level class documentation comment.
-Style/Documentation:
-  Enabled: false
-
-ClassAndModuleChildren:
-  Enabled: false
-
-Rails/FilePath:
-  Exclude:
-    - 'config/**/*'
+inherit_gem:
+  rubocop-github:
+    - config/default.yml
+    - config/rails.yml
