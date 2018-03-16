@@ -1,27 +1,40 @@
-# Ruby CircleCI 2.0 configuration file
-#
-# Check https://circleci.com/docs/2.0/language-ruby/ for more details
-#
 version: 2
 jobs:
   build:
     machine: true
     steps:
       - checkout
-
+      - restore_cache:
+          keys:
+            - v1-{{ checksum "Gemfile.lock" }}-{{ checksum "yarn.lock" }}
+          paths:
+            - ~/caches/images.tar
       - run:
-          name: install dependencies
+          name: Load docker images
           command: |
-            docker-compose run app bundle install --jobs=4 --retry=3 --path vendor/bundle
-
+            if [[ -e ~/caches/images.tar ]]; then
+              docker load -i ~/caches/images.tar
+            fi
+      - run:
+          name: Install dependencies
+          command: docker-compose run --rm app bundle install
       # Install yarn package
-      - run: docker-compose run app yarn install
-
+      - run: docker-compose run --rm app yarn install
       # Database setup
-      - run: docker-compose run app bundle exec rails db:create
-      - run: docker-compose run app bundle exec rails db:schema:load
-
+      - run: docker-compose run --rm app bundle exec rails db:create
+      - run: docker-compose run --rm app bundle exec rails db:schema:load
       # run tests!
       - run:
-          name: run tests
-          command: docker-compose run app bundle exec rspec
+          name: Run tests
+          command: docker-compose run --rm app bundle exec rspec
+      - run:
+          name: Save docker images
+          command: |
+            if [[ ! -e ~/caches/images.tar ]]; then
+              mkdir ~/caches
+              docker save -o ~/caches/images.tar $(docker images --filter "dangling=false" --format "{{.Repository}}:{{.Tag}}")
+            fi
+      - save_cache:
+          key: v1-{{ checksum "Gemfile.lock" }}-{{ checksum "yarn.lock" }}
+          paths:
+            - ~/caches/images.tar
