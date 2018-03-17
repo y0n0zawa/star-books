@@ -1,4 +1,4 @@
-# Star Books
+# Star Books [![CircleCI](https://circleci.com/gh/y0n0zawa/star-books.svg?style=svg)](https://circleci.com/gh/y0n0zawa/star-books)
 
 ## Requirements
 
